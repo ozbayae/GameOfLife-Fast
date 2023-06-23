@@ -86,12 +86,8 @@ void newLife()
 	// ew--calling a destructor
 	life->~Life();
 	life = new Life(size, size);
-	for (int i = 0; i < .6*size*size; i++)
-	{
-		int x = rand() % size + 1;
-		int y = rand() % size + 1;
-		life->setLife(x, y, 1);
-	}
+	life->randomize();
+
 }
 
 void newlife3d()

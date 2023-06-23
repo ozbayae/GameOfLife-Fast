@@ -22,7 +22,7 @@ protected:
 
 public:
 	World(int, int);
-	~World();
+	virtual ~World();
 
 	int getNeighbors(int, int, int);
 
