@@ -26,7 +26,6 @@ class Life : public World
 		cl_mem gridBuffer;
 		cl_mem new_gridBuffer;
 		size_t globalWorkSize[2];
-		//size_t localWorkSize[2];
 	} clinfo;
 
 	int convertToString(const char* filename, std::string& s);

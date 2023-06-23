@@ -40,3 +40,61 @@ kernel void update(global short* grid, global short* new_grid, int width) {
        new_grid[index] = 0;
     }
 }
+
+kernel void update3d(global short* grid, global short* new_grid, int width, int height) {
+    int x = get_global_id(0) + 1;
+    int y = get_global_id(1) + 1;
+    int z = get_global_id(2) + 1;
+
+    int count = 0;
+
+    count += grid[(y+1) + x*(width + 2) + z*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + x*(width + 2) + (z+1)*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + x*(width + 2) + (z-1)*(width + 2)*(height + 2)];
+
+    count +=  grid[(y + 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+    
+    count += grid[(y + 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y + 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+    //
+    count += grid[(y - 1) + x*(width + 2) + z*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+
+    count += grid[(y - 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+
+    count += grid[(y - 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y - 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+    //
+    count += grid[(y) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+
+    count += grid[(y) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+    count += grid[(y) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+
+    count += grid[(y) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+    count += grid[(y) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+    count += grid[(y) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+
+    int index = y + x*(width + 2) + z*(width + 2)*(height + 2);
+
+    if (count == 5)
+    {
+       new_grid[index] = 1;
+    }
+    else if (count < 3 || count > 5)
+    {
+       new_grid[index] = 0;
+    }
+    else
+    {
+       new_grid[index] = grid[index];;
+    }
+}

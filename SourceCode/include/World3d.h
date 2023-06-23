@@ -24,7 +24,7 @@ namespace world3
 
 	public:
 		World3d(int, int, int);
-		~World3d();
+		virtual ~World3d();
 
 		int getNeighbors(int, int, int, int);
 

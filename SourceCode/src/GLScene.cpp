@@ -96,13 +96,8 @@ void newlife3d()
 	// ew--calling a destructor
 	life3d->~Life3d();
 	life3d = new Life3d(size / 5, size / 5, size / 5);
-	for (int i = 0; i < .05*(size / 5)*(size / 5)*(size / 5); i++)
-	{
-		int x = rand() % size / 5 + 1;
-		int y = rand() % size / 5 + 1;
-		int z = rand() % size / 5 + 1;
-		life3d->setLife(x, y, z, 1);
-	}
+	life3d->randomize();
+
 }
 
 void DisplayGL()
