@@ -23,69 +23,121 @@ namespace world3
 
 	int World3d::getNewLife(int x, int y, int z)
 	{
-		return grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
+		if(!swapped)
+			return grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
+		else
+			return new_grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
 	}
 
 	void World3d::setNewLife(int x, int y, int z, int val)
 	{
-		new_grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
+		if(!swapped)
+			new_grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
+		else
+			grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
 	}
 
 	void World3d::swapGrids()
 	{
-		std::swap(grid, new_grid);
+		//std::swap(grid, new_grid);
+		swapped = !swapped;
 	}
 
 	int World3d::getNeighbors(int x, int y, int z, int val)
 	{
 		int count = 0;
 		
-		count += grid[(y+1) + x*(width + 2) + z*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + x*(width + 2) + (z+1)*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + x*(width + 2) + (z-1)*(width + 2)*(height + 2)];
+		if(!swapped) {
+			count += grid[(y+1) + x*(width + 2) + z*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + x*(width + 2) + (z+1)*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + x*(width + 2) + (z-1)*(width + 2)*(height + 2)];
 
-		count +=  grid[(y + 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count +=  grid[(y + 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
 		
-		count += grid[(y + 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y + 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
-		//
-		count += grid[(y - 1) + x*(width + 2) + z*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y + 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			//
+			count += grid[(y - 1) + x*(width + 2) + z*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
 
-		count += grid[(y - 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
 
-		count += grid[(y - 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y - 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
-		//
-		count += grid[(y) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y - 1) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			//
+			count += grid[(y) + x*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y) + x*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
 
-		count += grid[(y) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
-		count += grid[(y) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count += grid[(y) + (x + 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y) + (x + 1)*(width + 2) + (z)*(width + 2)*(height + 2)];
+			count += grid[(y) + (x + 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
 
-		count += grid[(y) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
-		count += grid[(y) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
-		count += grid[(y) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+			count += grid[(y) + (x - 1)*(width + 2) + z*(width + 2)*(height + 2)];
+			count += grid[(y) + (x - 1)*(width + 2) + (z + 1)*(width + 2)*(height + 2)];
+			count += grid[(y) + (x - 1)*(width + 2) + (z - 1)*(width + 2)*(height + 2)];
+		}
+		else 
+		{
+			count += new_grid[(y + 1) + x * (width + 2) + z * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + x * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + x * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y + 1) + (x + 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + (x + 1) * (width + 2) + (z) * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + (x + 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y + 1) + (x - 1) * (width + 2) + z * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + (x - 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y + 1) + (x - 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+			//
+			count += new_grid[(y - 1) + x * (width + 2) + z * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + x * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + x * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y - 1) + (x + 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + (x + 1) * (width + 2) + (z) * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + (x + 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y - 1) + (x - 1) * (width + 2) + z * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + (x - 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y - 1) + (x - 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+			//
+			count += new_grid[(y)+x * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y)+x * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y)+(x + 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y)+(x + 1) * (width + 2) + (z) * (width + 2) * (height + 2)];
+			count += new_grid[(y)+(x + 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+
+			count += new_grid[(y)+(x - 1) * (width + 2) + z * (width + 2) * (height + 2)];
+			count += new_grid[(y)+(x - 1) * (width + 2) + (z + 1) * (width + 2) * (height + 2)];
+			count += new_grid[(y)+(x - 1) * (width + 2) + (z - 1) * (width + 2) * (height + 2)];
+		}
 		
 		return count;
 	}
 
 	int World3d::getLifeform(int x, int y, int z)
 	{
-		return grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
+		if(!swapped)
+			return grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
+		else
+			return new_grid[y + x*(width + 2) + z*(width + 2)*(height + 2)];
 	}
 
 	void World3d::setLife(int x, int y, int z, int val)
 	{
-		grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
+		if(!swapped)
+			grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
+		else
+			new_grid[y + x*(width + 2) + z*(width + 2)*(height + 2)] = val;
 	}
 
 	void World3d::print()

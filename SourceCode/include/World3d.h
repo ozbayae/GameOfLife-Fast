@@ -16,6 +16,7 @@ namespace world3
 		unsigned int width;
 		unsigned int height;
 		unsigned int depth;
+		bool swapped = false;
 
 		int getNewLife(int x, int y, int z);
 		void setNewLife(int x, int y, int z, int val);
