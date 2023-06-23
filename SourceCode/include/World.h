@@ -16,7 +16,9 @@ protected:
 	unsigned int width;
 	unsigned int height;
 
-	int getNewLife(int x, int y);
+	bool swapped = false;
+
+	//int getNewLife(int x, int y);
 	void setNewLife(int x, int y, int val);
 	void swapGrids();
 

@@ -19,46 +19,70 @@ World::~World(){
 	free(grid); free(new_grid); 
 }
 
-int World::getNewLife(int x, int y)
-{ 
-	return grid[x*(width + 2) + y]; 
-}
+//int World::getNewLife(int x, int y)
+//{ 
+//	return grid[x*(width + 2) + y]; 
+//}
 
 void World::setNewLife(int x, int y, int val)
 { 
-	new_grid[x*(width + 2) + y] = val; 
+	if(!swapped)
+		new_grid[x*(width + 2) + y] = val; 
+	else
+		grid[x*(width + 2) + y] = val;
 }
 
 void World::swapGrids()
 {
-	std::swap(grid, new_grid);
+	//std::swap(grid, new_grid);
+	swapped = !swapped;
 }
 
 int World::getNeighbors(int x, int y, int val)
 {
 	int count = 0;
 
-	count += grid[(x-1)*(width + 2) + (y)];
-	count += grid[(x)*(width + 2) + (y-1)];
-	count += grid[(x - 1)*(width + 2) + (y-1)];
-	count += grid[(x + 1)*(width + 2) + (y)];
+	if (!swapped) {
+		count += grid[(x - 1) * (width + 2) + (y)];
+		count += grid[(x) * (width + 2) + (y - 1)];
+		count += grid[(x - 1) * (width + 2) + (y - 1)];
+		count += grid[(x + 1) * (width + 2) + (y)];
 
-	count += grid[(x)*(width + 2) + (y+1)];
-	count += grid[(x+1)*(width + 2) + (y+1)];
-	count += grid[(x+1)*(width + 2) + (y-1)];
-	count += grid[(x - 1)*(width + 2) + (y+1)];
+		count += grid[(x) * (width + 2) + (y + 1)];
+		count += grid[(x + 1) * (width + 2) + (y + 1)];
+		count += grid[(x + 1) * (width + 2) + (y - 1)];
+		count += grid[(x - 1) * (width + 2) + (y + 1)];
+	}
+	else {
+		count += new_grid[(x - 1) * (width + 2) + (y)];
+		count += new_grid[(x) * (width + 2) + (y - 1)];
+		count += new_grid[(x - 1) * (width + 2) + (y - 1)];
+		count += new_grid[(x + 1) * (width + 2) + (y)];
+
+		count += new_grid[(x) * (width + 2) + (y + 1)];
+		count += new_grid[(x + 1) * (width + 2) + (y + 1)];
+		count += new_grid[(x + 1) * (width + 2) + (y - 1)];
+		count += new_grid[(x - 1) * (width + 2) + (y + 1)];
+	}
+
 	
 	return count;
 }
 
 int World::getLifeform(int x, int y)
 { 
-	return grid[x*(width + 2) + y]; 
+	if(!swapped)
+		return grid[x*(width + 2) + y];
+	else
+		return new_grid[x*(width + 2) + y];
 }
 
 void World::setLife(int x, int y, int val)
 { 
-	grid[x*(width + 2) + y] = val; 
+	if(!swapped)
+		grid[x*(width + 2) + y] = val; 
+	else
+		new_grid[x*(width + 2) + y] = val;
 }
 
 void World::print()

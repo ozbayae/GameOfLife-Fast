@@ -43,4 +43,5 @@ public:
 	virtual void update();
 	int setupCL();
 	void randomize();
+
 };

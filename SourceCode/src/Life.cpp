@@ -48,26 +48,15 @@ void Life::update()
 
 	cl_int status;
 	//write data to device
-	status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
-	////check status
-	//if (status != CL_SUCCESS)
-	//{
-	//	cout << "Error: Writing data to device!" << endl;
-	//}
-
-	//compute on GPU
-	status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-	////check status
-	//if (status != CL_SUCCESS)
-	//	std::cerr << getErrorString(status) << std::endl;
-	//
-	//read data from device
-
-	status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), new_grid, 0, NULL, NULL);
-	////check status
-	//if (status != CL_SUCCESS)
-	//	std::cerr << getErrorString(status) << std::endl;
-	//swap grids
+	//status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+	if (!swapped) {
+		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), new_grid, 0, NULL, NULL);
+	}
+	else {
+		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+	}
 	swapGrids();
 
 
@@ -265,5 +254,5 @@ void Life::randomize() {
 		int y = rand() % height + 1;
 		setLife(x, y, 1);
 	}
-	//clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+	clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
 }

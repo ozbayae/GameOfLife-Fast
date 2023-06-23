@@ -31,12 +31,13 @@ void GLScene(int argc, char*argv[])
 
 void GLScene(int x, int y, int argc, char*argv[])
 {
-	for (int i = 0; i < 100000; i++)
-	{
-		int x = rand() % size + 1;
-		int y = rand() % size + 1;
-		life->setLife(x, y, 1);
-	}
+	//for (int i = 0; i < 100000; i++)
+	//{
+	//	int x = rand() % size + 1;
+	//	int y = rand() % size + 1;
+	//	life->setLife(x, y, 1);
+	//}
+	newLife();
 	newlife3d();
 	cout << glutGet(GLUT_ELAPSED_TIME) << endl;
 	window_height = y;
