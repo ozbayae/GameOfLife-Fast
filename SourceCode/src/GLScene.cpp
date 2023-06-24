@@ -1,10 +1,11 @@
 #include "GLScene.h"
 #include "Stopwatch.h"
+#include <vector>
 
 int size = 500;
 
-Life3d * life3d = new Life3d(size / 5, size / 5, size / 5);
-Life * life = new Life(size, size);
+Life3d* life3d = new Life3d(size / 5, size / 5, size / 5);
+Life* life = new Life(size, size);
 
 int window_width;
 int window_height;
@@ -25,12 +26,12 @@ int time_e = clock();
 
 Scene g_current = scene1;
 
-void GLScene(int argc, char*argv[])
+void GLScene(int argc, char* argv[])
 {
 	GLScene(900, 900, argc, argv);
 }
 
-void GLScene(int x, int y, int argc, char*argv[])
+void GLScene(int x, int y, int argc, char* argv[])
 {
 	//for (int i = 0; i < 100000; i++)
 	//{
@@ -113,16 +114,17 @@ void DisplayGL()
 		//float elapsed = tm.elaspsed();
 		//printf( "Render simulation: %5.1f ms\n", elapsed * 1000);
 		//screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
-	}else 
-	if (g_current == 1)
-	{
-		tm.start();
-		render3d();
-		tm.stop("Render 3D");
-		//float elapsed = tm.elaspsed();
-		//printf("Render simulation: %5.1f ms\n", elapsed * 1000);
-
 	}
+	else
+		if (g_current == 1)
+		{
+			tm.start();
+			render3d();
+			tm.stop("Render 3D");
+			//float elapsed = tm.elaspsed();
+			//printf("Render simulation: %5.1f ms\n", elapsed * 1000);
+
+		}
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -145,14 +147,15 @@ void KeyboardGL(unsigned char c, int x, int y)
 			glEnable(GL_LIGHTING);
 			glEnable(GL_LIGHT0);
 			(g_current = scene2);
-		} else
-		if (g_current == scene2)
-		{
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_LIGHT0);
-			g_current = scene1;
 		}
+		else
+			if (g_current == scene2)
+			{
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_LIGHTING);
+				glDisable(GL_LIGHT0);
+				g_current = scene1;
+			}
 	}
 	if (c == 'w')
 	{
@@ -168,7 +171,7 @@ void KeyboardGL(unsigned char c, int x, int y)
 	{
 		x_offset -= 0.1;
 	}
-	
+
 	if (c == 'a')
 	{
 		x_offset += 0.1;
@@ -246,7 +249,7 @@ void KeyboardGL(unsigned char c, int x, int y)
 		size = 1000;
 		newLife();
 		newlife3d();
-		
+
 	}
 	if (c == '@')
 	{
@@ -299,20 +302,21 @@ void ReshapeGL(int w, int h)
 
 void render()
 {
+	glewInit();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float y_t = 0.0f;
 	float x_t = 0.0f;
-	float off = 500 / (float)size *0.01f;
+	float off = 500 / (float)size * 0.01f;
 
 	//glScalef(1.0f+scal, 1.0f+scal, 1.0f+scal);
-	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f+scal);
+	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f + scal);
 	//glTranslatef(-0.5f, -0.5f, 0.0f);
-	if(shade == false) glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
+	if (shade == false) glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
 	//GLfloat cyan[] = { (169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f), 1.f };
 	//glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
-	glBegin(GL_QUADS);
-	for (int i = 0; i < size; i++)
+	//glBegin(GL_QUADS);
+	/*for (int i = 0; i < size; i++)
 	{
 		x_t = 0.0f;
 		for (int j = 0; j < size; j++)
@@ -329,14 +333,57 @@ void render()
 			x_t += (500/(float)size) * 0.02f;
 		}
 		y_t += (500 / (float)size) *0.02f;
+	}*/
+
+	GLuint vbo = 0;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	std::vector<GLfloat> vertices;
+
+	for (int i = 0; i < size; i++)
+	{
+		x_t = 0.0f;
+		for (int j = 0; j < size; j++)
+		{
+			if (life->getLifeform(j + 1, i + 1) == 1)
+			{
+				if (shade == true) vertices.push_back(((float)i / (float)size));
+				if (shade == true) vertices.push_back(((float)j / (float)size));
+				if (shade == true) vertices.push_back(1.0f);
+				vertices.push_back(x_t - off);
+				vertices.push_back(y_t + off);
+				vertices.push_back(x_t + off);
+				vertices.push_back(y_t + off);
+				vertices.push_back(x_t + off);
+				vertices.push_back(y_t - off);
+				vertices.push_back(x_t - off);
+				vertices.push_back(y_t - off);
+			}
+
+			x_t += (500 / (float)size) * 0.02f;
+		}
+		y_t += (500 / (float)size) * 0.02f;
 	}
-	glEnd();
+
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+
+	glDrawArrays(GL_QUADS, 0, vertices.size() / 2);
+
+	glDisableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &vbo);
+	//glEnd();
 	glPopMatrix();
 	if (sim == true)
 	{
 		life->update();
 	}
-	
+
 }
 
 void render3d()
@@ -349,7 +396,7 @@ void render3d()
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		
+
 		if (shade == false)
 		{
 			GLfloat green[] = { (169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f), 1.f };
@@ -359,11 +406,11 @@ void render3d()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glTranslatef(0.0f + x_offset, 0.0f + y_offset, -7.0f + scal);
-		glRotatef(rot_angle/3, rot_x, rot_y, rot_z);
-		glRotatef(rot_angle/3, rot_z, rot_y, rot_x);
-		glRotatef(rot_angle/3, rot_x, rot_z, rot_y);
+		glRotatef(rot_angle / 3, rot_x, rot_y, rot_z);
+		glRotatef(rot_angle / 3, rot_z, rot_y, rot_x);
+		glRotatef(rot_angle / 3, rot_x, rot_z, rot_y);
 		glTranslatef(-2.0f, -2.0f, -2.0f);
-		
+
 		glBegin(GL_QUADS);
 		float sz = 2.0f * 5.0f / size;
 		for (int i = 0; i < size / 5; i++)
@@ -406,17 +453,17 @@ void render3d()
 						glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
 						glVertex3f(-sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
 					}
-					x_t += sz*2.0f;
+					x_t += sz * 2.0f;
 				}
-				y_t += sz*2.0f;
+				y_t += sz * 2.0f;
 			}
-			z_t += sz*2.0f;
+			z_t += sz * 2.0f;
 		}
 		glEnd();
 		if (sim == true)
 		{
 			//cout << clock() - time_e << endl;
-			if ((int)(clock() - time_e) > 100 )
+			if ((int)(clock() - time_e) > 100)
 			{
 				time_e = clock();
 				life3d->update();
@@ -426,7 +473,7 @@ void render3d()
 		if (b_rot)
 		{
 			rot_angle++;
-			rot_x = ((int)((rot_x + 1.0f) * 10.0f) % 10)/10.0f;
+			rot_x = ((int)((rot_x + 1.0f) * 10.0f) % 10) / 10.0f;
 			rot_y = ((int)((rot_y + 1.0f) * 10.0f) % 10) / 10.0f;
 			rot_z = ((int)((rot_z + 1.0f) * 10.0f) % 10) / 10.0f;
 		}

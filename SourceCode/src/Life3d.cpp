@@ -9,46 +9,46 @@ namespace life3
 		Stopwatch tm;
 		tm.start();
 
-		for (unsigned int i = 1; i <= height; i++)
-		{
-			for (unsigned int j = 1; j <= width; j++)
-			{
-				for (unsigned int k = 1; k <= depth; k++)
-				{
-					int m = getNeighbors(i, j, k, 1);
-					if (m == 5)
-					{
-						setNewLife(i, j, k, 1);
-					}
-					else
-					if (m < 3)
-					{
-						setNewLife(i, j, k, 0);
-					}
-					else
-					if (m > 5)
-					{
-						setNewLife(i, j, k, 0);
-					}
-					else if ((m == 4) | (m == 5))
-					{
-						setNewLife(i, j, k, getLifeform(i, j, k));
-					}
-				}
-			}
-		}
+		//for (unsigned int i = 1; i <= height; i++)
+		//{
+		//	for (unsigned int j = 1; j <= width; j++)
+		//	{
+		//		for (unsigned int k = 1; k <= depth; k++)
+		//		{
+		//			int m = getNeighbors(i, j, k, 1);
+		//			if (m == 5)
+		//			{
+		//				setNewLife(i, j, k, 1);
+		//			}
+		//			else
+		//			if (m < 3)
+		//			{
+		//				setNewLife(i, j, k, 0);
+		//			}
+		//			else
+		//			if (m > 5)
+		//			{
+		//				setNewLife(i, j, k, 0);
+		//			}
+		//			else if ((m == 4) | (m == 5))
+		//			{
+		//				setNewLife(i, j, k, getLifeform(i, j, k));
+		//			}
+		//		}
+		//	}
+		//}
 
-		//cl_int status;
-		////write data to device
-		////status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
-		//if (!swapped) {
-		//	status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 3, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		//	status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2) * (depth + 2), new_grid, 0, NULL, NULL);
-		//}
-		//else {
-		//	status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 3, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		//	status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2) * (depth + 2), grid, 0, NULL, NULL);
-		//}
+		cl_int status;
+		//write data to device
+		//status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+		if (!swapped) {
+			status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 3, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+			status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2) * (depth + 2), new_grid, 0, NULL, NULL);
+		}
+		else {
+			status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 3, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+			status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2) * (depth + 2), grid, 0, NULL, NULL);
+		}
 
 		swapGrids();
 		tm.stop("Simulation 3D");
