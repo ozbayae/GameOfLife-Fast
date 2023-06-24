@@ -1,4 +1,5 @@
 #include "GLScene.h"
+#include "Stopwatch.h"
 
 int size = 500;
 
@@ -102,22 +103,24 @@ void newlife3d()
 
 void DisplayGL()
 {
-	Timer tm;
+	Stopwatch tm;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (g_current == 0)
 	{
-		tm.reset();
+		tm.start();
 		render();
-		float elapsed = tm.elaspsed();
-		printf( "Render simulation: %5.1f ms\n", elapsed * 1000);
+		tm.stop("Render 2D");
+		//float elapsed = tm.elaspsed();
+		//printf( "Render simulation: %5.1f ms\n", elapsed * 1000);
 		//screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
 	}else 
 	if (g_current == 1)
 	{
-		tm.reset();
+		tm.start();
 		render3d();
-		float elapsed = tm.elaspsed();
-		printf("Render simulation: %5.1f ms\n", elapsed * 1000);
+		tm.stop("Render 3D");
+		//float elapsed = tm.elaspsed();
+		//printf("Render simulation: %5.1f ms\n", elapsed * 1000);
 
 	}
 	glutSwapBuffers();

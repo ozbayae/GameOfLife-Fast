@@ -30,6 +30,9 @@
     <ClInclude Include="include\World3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Stopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GLScene.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\World3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

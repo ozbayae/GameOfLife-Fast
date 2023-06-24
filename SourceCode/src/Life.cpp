@@ -1,4 +1,5 @@
 #include "Life.h"
+#include "Stopwatch.h"
 const char* getErrorString(cl_int error);
 
 
@@ -24,6 +25,9 @@ Life::~Life()
 
 void Life::update()
 {
+	Stopwatch tm;
+
+	tm.start();
 	for (unsigned int i = 1; i <= height; i++)
 	{
 		for (unsigned int j = 1; j <= width; j++)
@@ -59,7 +63,7 @@ void Life::update()
 	//}
 	//swapGrids();
 
-
+	tm.stop("Simulation 2D");
 }
 
 int Life::setupCL() {

@@ -132,10 +132,12 @@
     <ClInclude Include="include\GLScene.h" />
     <ClInclude Include="include\Life.h" />
     <ClInclude Include="include\Life3d.h" />
+    <ClInclude Include="include\Stopwatch.h" />
     <ClInclude Include="include\World.h" />
     <ClInclude Include="include\World3d.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Stopwatch.cpp" />
     <ClCompile Include="src\GLScene.cpp" />
     <ClCompile Include="src\Life.cpp" />
     <ClCompile Include="src\Life3d.cpp" />
