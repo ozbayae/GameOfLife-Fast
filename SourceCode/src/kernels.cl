@@ -98,3 +98,31 @@ kernel void update3d(global short* grid, global short* new_grid, int width, int 
        new_grid[index] = grid[index];;
     }
 }
+
+int increase(volatile __global int* counter)
+{
+  atomic_add(counter, 8);
+  return *counter;
+}
+
+kernel void generate_vertices(global short* grid, global float* vertices, global int* count, int size) {
+    //calculate the index
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    float x_t = x * (500 / (float) size) * 0.02f;
+    float y_t = y * (500 / (float) size) * 0.02f;
+    float off = 500 / (float)size * 0.01f;
+    int index = (x + 1) * (size + 2) + (y + 1);
+    bool alive = grid[index] == 1;
+    if (alive) {
+		int i = increase(count); // 8 vertices per cell
+        vertices[i-8] = x_t - off;
+        vertices[i-7] = y_t - off;
+        vertices[i-6] = x_t + off;
+        vertices[i-5] = y_t - off;
+        vertices[i-4] = x_t + off;
+        vertices[i-3] = y_t + off;
+        vertices[i-2] = x_t - off;
+        vertices[i-1] = y_t + off;
+	}
+}
