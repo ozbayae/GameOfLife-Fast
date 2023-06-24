@@ -334,7 +334,8 @@ void render()
 		}
 		y_t += (500 / (float)size) *0.02f;
 	}*/
-
+	Stopwatch tm;
+	tm.start();
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -365,7 +366,9 @@ void render()
 		}
 		y_t += (500 / (float)size) * 0.02f;
 	}
+	tm.stop("Loading vertices into vector");
 
+	tm.start();
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
@@ -379,6 +382,7 @@ void render()
 	glDeleteBuffers(1, &vbo);
 	//glEnd();
 	glPopMatrix();
+	tm.stop("Drawing vertices");
 	if (sim == true)
 	{
 		life->update();
