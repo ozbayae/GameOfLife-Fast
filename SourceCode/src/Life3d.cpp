@@ -1,9 +1,11 @@
 #include "Life3d.h"
 
+
 namespace life3
 {
 	void Life3d::update()
 	{
+
 
 		//for (unsigned int i = 1; i <= height; i++)
 		//{
@@ -45,7 +47,10 @@ namespace life3
 			status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 3, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
 			status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2) * (depth + 2), grid, 0, NULL, NULL);
 		}
+
 		swapGrids();
+
+
 	}
 
 	int Life3d::setupCL()

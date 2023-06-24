@@ -102,14 +102,23 @@ void newlife3d()
 
 void DisplayGL()
 {
+	Timer tm;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (g_current == 0)
 	{
+		tm.reset();
 		render();
+		float elapsed = tm.elaspsed();
+		printf( "Render simulation: %5.1f ms\n", elapsed * 1000);
+		//screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
 	}else 
 	if (g_current == 1)
 	{
+		tm.reset();
 		render3d();
+		float elapsed = tm.elaspsed();
+		printf("Render simulation: %5.1f ms\n", elapsed * 1000);
+
 	}
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -227,31 +236,38 @@ void KeyboardGL(unsigned char c, int x, int y)
 	{
 		size = 900;
 		newLife();
+		newlife3d();
 	}
 	if (c == '!')
 	{
 		size = 1000;
 		newLife();
+		newlife3d();
+		
 	}
 	if (c == '@')
 	{
 		size = 2000;
 		newLife();
+		newlife3d();
 	}
 	if (c == '#')
 	{
 		size = 3000;
 		newLife();
+		newlife3d();
 	}
 	if (c == '$')
 	{
 		size = 4000;
 		newLife();
+		newlife3d();
 	}
 	if (c == '%')
 	{
 		size = 5000;
 		newLife();
+		newlife3d();
 	}
 }
 

@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 
+
 #define SUCCESS 0
 #define FAILURE 1
 
@@ -16,6 +17,8 @@ using namespace world3;
 
 #ifndef LIFE3D_H
 #define LIFE3D_H
+
+
 namespace life3
 {
 	class Life3d : public World3d
