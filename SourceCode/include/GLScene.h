@@ -31,4 +31,6 @@ void ReshapeGL(int w, int h);
 
 void render();
 void render3d();
+
+void testInstancedRendering();
 #endif
