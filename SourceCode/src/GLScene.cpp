@@ -26,6 +26,8 @@ int time_e = clock();
 
 Scene g_current = scene1;
 
+//std::vector<GLfloat> vertices;
+
 void GLScene(int argc, char* argv[])
 {
 	GLScene(900, 900, argc, argv);
@@ -88,7 +90,35 @@ void newLife()
 {
 	// ew--calling a destructor
 	life->~Life();
+	//vertices.clear();
+
 	life = new Life(size, size);
+
+	////precalculate the vertices for the grid so we don't have to do it every frame
+	//float y_t = 0.0f;
+	//float x_t = 0.0f;
+	//float off = 500 / (float)size * 0.01f;
+	//for (int i = 0; i < size; i++)
+	//{
+	//	x_t = 0.0f;
+	//	for (int j = 0; j < size; j++)
+	//	{
+	//		if (shade == true) vertices.push_back(((float)i / (float)size));
+	//		if (shade == true) vertices.push_back(((float)j / (float)size));
+	//		if (shade == true) vertices.push_back(1.0f);
+	//		vertices.push_back(x_t - off);
+	//		vertices.push_back(y_t + off);
+	//		vertices.push_back(x_t + off);
+	//		vertices.push_back(y_t + off);
+	//		vertices.push_back(x_t + off);
+	//		vertices.push_back(y_t - off);
+	//		vertices.push_back(x_t - off);
+	//		vertices.push_back(y_t - off);
+
+	//		x_t += (500 / (float)size) * 0.02f;
+	//	}
+	//	y_t += (500 / (float)size) * 0.02f;
+	//}
 	life->randomize();
 
 }
@@ -277,6 +307,7 @@ void KeyboardGL(unsigned char c, int x, int y)
 	}
 }
 
+//std::vector<GLfloat> vertices;
 void ReshapeGL(int w, int h)
 {
 	//std::cout << "ReshapGL( " << w << ", " << h << " );" << std::endl;
@@ -299,6 +330,12 @@ void ReshapeGL(int w, int h)
 	//render();
 	glutPostRedisplay();
 }
+
+
+
+//faster than vector since it is a fixed size, no dynamic allocation needed as vector grows	
+GLfloat vertices[5000 * 5000 * 8];
+GLfloat colors[5000 * 5000 * 3];
 
 void render()
 {
@@ -339,9 +376,9 @@ void render()
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
+	
+	/*vertices.clear();
 	std::vector<GLfloat> vertices;
-
 	for (int i = 0; i < size; i++)
 	{
 		x_t = 0.0f;
@@ -366,15 +403,87 @@ void render()
 		}
 		y_t += (500 / (float)size) * 0.02f;
 	}
-	tm.stop("Loading vertices into vector");
+	tm.stop("Loading vertices into vector");*/
+
+	int vCount = 0;
+	int cCount = 0;
+	for (int i = 0; i < size; i++)
+	{
+		x_t = 0.0f;
+		for (int j = 0; j < size; j++)
+		{
+			if (life->getLifeform(j + 1, i + 1) == 1)
+			{
+				if (shade == true)
+				{
+					colors[cCount++] = ((float)i / (float)size);
+					colors[cCount++] = ((float)j / (float)size);
+					colors[cCount++] = 1.0f;
+				}
+				vertices[vCount++] = x_t - off;
+				vertices[vCount++] = y_t + off;
+				vertices[vCount++] = x_t + off;
+				vertices[vCount++] = y_t + off;
+				vertices[vCount++] = x_t + off;
+				vertices[vCount++] = y_t - off;
+				vertices[vCount++] = x_t - off;
+				vertices[vCount++] = y_t - off;
+			}
+
+			x_t += (500 / (float)size) * 0.02f;
+		}
+		y_t += (500 / (float)size) * 0.02f;
+	}
+	tm.stop("Loading vertices into array");
+
+	//add indices to indeces vector for drawing based on live cells
+	/*tm.start();
+	std::vector<int> indices;
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (life->getLifeform(j + 1, i + 1) == 1)
+			{
+				int index = i * size + j * 8;
+				indices.push_back(index );
+				indices.push_back(index + 1);
+				indices.push_back(index + 2);
+				indices.push_back(index + 3);
+				indices.push_back(index + 4);
+				indices.push_back(index + 5);
+				indices.push_back(index + 6);
+				indices.push_back(index + 7);
+			}
+		}
+	}
+	tm.stop("Loading indices into vector");*/
+
+	//tm.start();
+	//int live_cells = 0;
+	//for (int i = 0; i < size; i++)
+	//{
+	//	for (int j = 0; j < size; j++)
+	//	{
+	//		if (life->getLifeform(j + 1, i + 1) == 1)
+	//		{
+	//			live_cells++;
+	//		}
+	//	}
+	//}
+	//tm.stop("Counting live cells");
 
 	tm.start();
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vCount * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 
-	glDrawArrays(GL_QUADS, 0, vertices.size() / 2);
+	if (shade == true) {
+		glColorPointer(3, GL_FLOAT, 0, &colors[0]);
+	}
+
+	glDrawArrays(GL_QUADS, 0, vCount / 2);
 
 	glDisableVertexAttribArray(0);
 
