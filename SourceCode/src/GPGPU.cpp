@@ -74,7 +74,12 @@ GPGPU::~GPGPU()
 
 Kernel::Kernel(const char* kernels_path, const char* kernel_name) : GPGPU(kernels_path)
 {
-	kernel = clCreateKernel(clinfo.program, kernel_name, NULL);
+	int status;
+	kernel = clCreateKernel(clinfo.program, kernel_name, &status);
+	if (status != CL_SUCCESS)
+	{
+		std::cout << "Error: Creating kernel failed!" << std::endl;
+	}
 }
 
 //destructor for Kernel class
