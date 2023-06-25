@@ -344,6 +344,7 @@ void render()
 	float y_t = 0.0f;
 	float x_t = 0.0f;
 	float off = 500 / (float)size * 0.01f;
+	float pos_off = 500 / (float)size * 0.02f;
 
 	//glScalef(1.0f+scal, 1.0f+scal, 1.0f+scal);
 	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f + scal);
@@ -372,9 +373,9 @@ void render()
 					vertices[vCount++] = y_t - off;
 				}
 
-				x_t += (500 / (float)size) * 0.02f;
+				x_t += pos_off;
 			}
-			y_t += (500 / (float)size) * 0.02f;
+			y_t += pos_off;
 		}
 		tm.stop("Loading vertices into array");
 
