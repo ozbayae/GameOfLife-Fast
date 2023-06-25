@@ -471,9 +471,45 @@ void render3d()
 		glRotatef(rot_angle / 3, rot_x, rot_z, rot_y);
 		glTranslatef(-2.0f, -2.0f, -2.0f);
 
-		glBegin(GL_QUADS);
+		//glBegin(GL_QUADS);
+
+
 		float sz = 2.0f * 5.0f / size;
-		for (int i = 0; i < size / 5; i++)
+
+		//define the 3d cube with vertices and normals
+		float quadCube[] = {
+			sz + x_t, sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
+			sz + x_t, -sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
+			-sz + x_t, -sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
+			-sz + x_t, sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
+
+			sz + x_t, sz + y_t, -sz + z_t, 0.0f, 0.0f, -1.0f,
+			sz + x_t, -sz + y_t, -sz + z_t, 0.0f, 0.0f, -1.0f,
+			-sz + x_t, -sz + y_t, -sz + z_t, 0.0f, 0.0f, -1.0f,
+			-sz + x_t, sz + y_t, -sz + z_t, 0.0f, 0.0f, -1.0f,
+
+			sz + x_t, sz + y_t, sz + z_t, 0.0f, 1.0f, 0.0f,
+			sz + x_t, sz + y_t, -sz + z_t, 0.0f, 1.0f, 0.0f,
+			-sz + x_t, sz + y_t, -sz + z_t, 0.0f, 1.0f, 0.0f,
+			-sz + x_t, sz + y_t, sz + z_t, 0.0f, 1.0f, 0.0f,
+
+			sz + x_t, -sz + y_t, sz + z_t, 0.0f, -1.0f, 0.0f,
+			sz + x_t, -sz + y_t, -sz + z_t, 0.0f, -1.0f, 0.0f,
+			-sz + x_t, -sz + y_t, -sz + z_t, 0.0f, -1.0f, 0.0f,
+			-sz + x_t, -sz + y_t, sz + z_t, 0.0f, -1.0f, 0.0f,
+
+			sz + x_t, sz + y_t, sz + z_t, 1.0f, 0.0f, 0.0f,
+			sz + x_t, -sz + y_t, sz + z_t, 1.0f, 0.0f, 0.0f,
+			sz + x_t, -sz + y_t, -sz + z_t, 1.0f, 0.0f, 0.0f,
+			sz + x_t, sz + y_t, -sz + z_t, 1.0f, 0.0f, 0.0f,
+
+			-sz + x_t, sz + y_t, sz + z_t, -1.0f, 0.0f, 0.0f,
+			-sz + x_t, -sz + y_t, sz + z_t, -1.0f, 0.0f, 0.0f,
+			-sz + x_t, -sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f,
+			-sz + x_t, sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f
+		};
+
+		/*for (int i = 0; i < size / 5; i++)
 		{
 			y_t = 0.0f;
 			for (int j = 0; j < size / 5; j++)
@@ -519,7 +555,7 @@ void render3d()
 			}
 			z_t += sz * 2.0f;
 		}
-		glEnd();
+		glEnd();*/
 		if (sim == true)
 		{
 			//cout << clock() - time_e << endl;
