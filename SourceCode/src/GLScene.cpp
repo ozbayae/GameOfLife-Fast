@@ -380,6 +380,22 @@ void render()
 		tm.stop("Loading vertices into array");
 
 		tm.start();
+		//count live with get life form
+		int live_cells = 0;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++)
+			{
+				if (life->getLifeform(j + 1, i + 1) == 1)
+				{
+					live_cells++;
+				}
+			}
+		}
+
+		//live cells is used for the size of the array of vertices
+		tm.stop("Counting live cells");
+
+		tm.start();
 		GLuint vbo = 0;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
