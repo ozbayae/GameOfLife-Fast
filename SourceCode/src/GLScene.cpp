@@ -335,7 +335,6 @@ void ReshapeGL(int w, int h)
 
 //faster than vector since it is a fixed size, no dynamic allocation needed as vector grows	
 GLfloat vertices[5000 * 5000 * 8];
-GLfloat colors[5000 * 5000 * 3];
 
 void render()
 {
@@ -349,149 +348,80 @@ void render()
 	//glScalef(1.0f+scal, 1.0f+scal, 1.0f+scal);
 	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f + scal);
 	//glTranslatef(-0.5f, -0.5f, 0.0f);
-	if (shade == false) glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
+	if (shade == false) {
+		glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
+		Stopwatch tm;
+		tm.start();
+
+		int vCount = 0;
+		int cCount = 0;
+		for (int i = 0; i < size; i++)
+		{
+			x_t = 0.0f;
+			for (int j = 0; j < size; j++)
+			{
+				if (life->getLifeform(j + 1, i + 1) == 1)
+				{
+					vertices[vCount++] = x_t - off;
+					vertices[vCount++] = y_t + off;
+					vertices[vCount++] = x_t + off;
+					vertices[vCount++] = y_t + off;
+					vertices[vCount++] = x_t + off;
+					vertices[vCount++] = y_t - off;
+					vertices[vCount++] = x_t - off;
+					vertices[vCount++] = y_t - off;
+				}
+
+				x_t += (500 / (float)size) * 0.02f;
+			}
+			y_t += (500 / (float)size) * 0.02f;
+		}
+		tm.stop("Loading vertices into array");
+
+		tm.start();
+		GLuint vbo = 0;
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vCount * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(2, GL_FLOAT, 0, 0);
+
+		glDrawArrays(GL_QUADS, 0, vCount / 2);
+
+		glDisableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDeleteBuffers(1, &vbo);
+
+		tm.stop("Drawing vertices");
+	}
+	else {
+		glBegin(GL_QUADS);
+		for (int i = 0; i < size; i++)
+		{
+			x_t = 0.0f;
+			for (int j = 0; j < size; j++)
+			{
+				if (life->getLifeform(j + 1, i + 1) == 1)
+				{
+					if (shade == true) glColor3f(((float)i / (float)size), ((float)j / (float)size), 1.0f);
+					glVertex2f(x_t - off, y_t + off);
+					glVertex2f(x_t + off, y_t + off);
+					glVertex2d(x_t + off, y_t - off);
+					glVertex2d(x_t - off, y_t - off);
+				}
+
+				x_t += (500 / (float)size) * 0.02f;
+			}
+			y_t += (500 / (float)size) * 0.02f;
+		}
+		glEnd();
+	}
+	glPopMatrix();
 	//GLfloat cyan[] = { (169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f), 1.f };
 	//glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
-	//glBegin(GL_QUADS);
-	/*for (int i = 0; i < size; i++)
-	{
-		x_t = 0.0f;
-		for (int j = 0; j < size; j++)
-		{
-			if (life->getLifeform(j + 1, i + 1) == 1)
-			{
-				if (shade == true) glColor3f(((float)i / (float)size), ((float)j / (float)size), 1.0f);
-				glVertex2f(x_t - off, y_t + off);
-				glVertex2f(x_t + off, y_t + off);
-				glVertex2d(x_t + off, y_t - off);
-				glVertex2d(x_t - off, y_t - off);
-			}
 
-			x_t += (500/(float)size) * 0.02f;
-		}
-		y_t += (500 / (float)size) *0.02f;
-	}*/
-	Stopwatch tm;
-	tm.start();
-	GLuint vbo = 0;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	
-	/*vertices.clear();
-	std::vector<GLfloat> vertices;
-	for (int i = 0; i < size; i++)
-	{
-		x_t = 0.0f;
-		for (int j = 0; j < size; j++)
-		{
-			if (life->getLifeform(j + 1, i + 1) == 1)
-			{
-				if (shade == true) vertices.push_back(((float)i / (float)size));
-				if (shade == true) vertices.push_back(((float)j / (float)size));
-				if (shade == true) vertices.push_back(1.0f);
-				vertices.push_back(x_t - off);
-				vertices.push_back(y_t + off);
-				vertices.push_back(x_t + off);
-				vertices.push_back(y_t + off);
-				vertices.push_back(x_t + off);
-				vertices.push_back(y_t - off);
-				vertices.push_back(x_t - off);
-				vertices.push_back(y_t - off);
-			}
 
-			x_t += (500 / (float)size) * 0.02f;
-		}
-		y_t += (500 / (float)size) * 0.02f;
-	}
-	tm.stop("Loading vertices into vector");*/
-
-	int vCount = 0;
-	int cCount = 0;
-	for (int i = 0; i < size; i++)
-	{
-		x_t = 0.0f;
-		for (int j = 0; j < size; j++)
-		{
-			if (life->getLifeform(j + 1, i + 1) == 1)
-			{
-				if (shade == true)
-				{
-					colors[cCount++] = ((float)i / (float)size);
-					colors[cCount++] = ((float)j / (float)size);
-					colors[cCount++] = 1.0f;
-				}
-				vertices[vCount++] = x_t - off;
-				vertices[vCount++] = y_t + off;
-				vertices[vCount++] = x_t + off;
-				vertices[vCount++] = y_t + off;
-				vertices[vCount++] = x_t + off;
-				vertices[vCount++] = y_t - off;
-				vertices[vCount++] = x_t - off;
-				vertices[vCount++] = y_t - off;
-			}
-
-			x_t += (500 / (float)size) * 0.02f;
-		}
-		y_t += (500 / (float)size) * 0.02f;
-	}
-	tm.stop("Loading vertices into array");
-
-	//add indices to indeces vector for drawing based on live cells
-	/*tm.start();
-	std::vector<int> indices;
-	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-		{
-			if (life->getLifeform(j + 1, i + 1) == 1)
-			{
-				int index = i * size + j * 8;
-				indices.push_back(index );
-				indices.push_back(index + 1);
-				indices.push_back(index + 2);
-				indices.push_back(index + 3);
-				indices.push_back(index + 4);
-				indices.push_back(index + 5);
-				indices.push_back(index + 6);
-				indices.push_back(index + 7);
-			}
-		}
-	}
-	tm.stop("Loading indices into vector");*/
-
-	//tm.start();
-	//int live_cells = 0;
-	//for (int i = 0; i < size; i++)
-	//{
-	//	for (int j = 0; j < size; j++)
-	//	{
-	//		if (life->getLifeform(j + 1, i + 1) == 1)
-	//		{
-	//			live_cells++;
-	//		}
-	//	}
-	//}
-	//tm.stop("Counting live cells");
-
-	tm.start();
-	glBufferData(GL_ARRAY_BUFFER, vCount * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-
-	if (shade == true) {
-		glColorPointer(3, GL_FLOAT, 0, &colors[0]);
-	}
-
-	glDrawArrays(GL_QUADS, 0, vCount / 2);
-
-	glDisableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &vbo);
-	//glEnd();
-	glPopMatrix();
-	tm.stop("Drawing vertices");
 	if (sim == true)
 	{
 		life->update();
