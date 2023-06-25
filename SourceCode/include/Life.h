@@ -42,5 +42,7 @@ public:
 	virtual void update();
 	int setupCL();
 	void randomize();
+	//get gridbuffer
+	cl_mem getGridBuffer();
 
 };

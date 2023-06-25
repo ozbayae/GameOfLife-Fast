@@ -24,10 +24,12 @@ public:
 		cl_program program;
 	} clinfo;
 
-		GPGPU(const char* kernels_path);
-		virtual ~GPGPU();
+	GPGPU(const char* kernels_path);
+
+	virtual ~GPGPU();
 
 private:
+
 	int convertToString(const char* filename, std::string& s);
 };
 
@@ -36,6 +38,21 @@ class Kernel : GPGPU
 public:
 	
 	cl_kernel kernel;
+
 	Kernel(const char* kernels_path, const char* kernel_name);
+
 	~Kernel();
+
+	cl_platform_id getPlatform();
+
+	cl_device_id* getDevices();
+
+	cl_context getContext();
+
+	cl_command_queue getCommandQueue();
+
+	cl_program getProgram();
+
 };
+
+const char* getErrorString(cl_int error);
