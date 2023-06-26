@@ -2,7 +2,7 @@
 #include "Stopwatch.h"
 #include <vector>
 #include "learnopengl-shader.h"
-
+#include <algorithm>
 int size = 500;
 
 Life3d* life3d = new Life3d(size / 5, size / 5, size / 5);
@@ -28,6 +28,7 @@ int time_e = clock();
 Scene g_current = scene1;
 
 //std::vector<GLfloat> vertices;
+//std::vector<glm::vec2> positions;
 
 void GLScene(int argc, char* argv[])
 {
@@ -95,30 +96,13 @@ void newLife()
 
 	life = new Life(size, size);
 
-	////precalculate the vertices for the grid so we don't have to do it every frame
-	//float y_t = 0.0f;
-	//float x_t = 0.0f;
-	//float off = 500 / (float)size * 0.01f;
+	////fill positions vector
 	//for (int i = 0; i < size; i++)
 	//{
-	//	x_t = 0.0f;
 	//	for (int j = 0; j < size; j++)
 	//	{
-	//		if (shade == true) vertices.push_back(((float)i / (float)size));
-	//		if (shade == true) vertices.push_back(((float)j / (float)size));
-	//		if (shade == true) vertices.push_back(1.0f);
-	//		vertices.push_back(x_t - off);
-	//		vertices.push_back(y_t + off);
-	//		vertices.push_back(x_t + off);
-	//		vertices.push_back(y_t + off);
-	//		vertices.push_back(x_t + off);
-	//		vertices.push_back(y_t - off);
-	//		vertices.push_back(x_t - off);
-	//		vertices.push_back(y_t - off);
-
-	//		x_t += (500 / (float)size) * 0.02f;
+	//		positions.push_back(glm::vec2(i, j));
 	//	}
-	//	y_t += (500 / (float)size) * 0.02f;
 	//}
 	life->randomize();
 
@@ -340,6 +324,8 @@ GLfloat vertices[5000 * 5000 * 8];
 
 void render()
 {
+	Stopwatch copyTimer;
+
 	glewInit();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -381,21 +367,21 @@ void render()
 		}
 		tm.stop("Loading vertices into array");
 
-		tm.start();
-		//count live with get life form
-		int live_cells = 0;
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++)
-			{
-				if (life->getLifeform(j + 1, i + 1) == 1)
-				{
-					live_cells++;
-				}
-			}
-		}
+		//tm.start();
+		////count live with get life form
+		//int live_cells = 0;
+		//for (int i = 0; i < size; i++) {
+		//	for (int j = 0; j < size; j++)
+		//	{
+		//		if (life->getLifeform(j + 1, i + 1) == 1)
+		//		{
+		//			live_cells++;
+		//		}
+		//	}
+		//}
 
-		//live cells is used for the size of the array of vertices
-		tm.stop("Counting live cells");
+		////live cells is used for the size of the array of vertices
+		//tm.stop("Counting live cells");
 
 		tm.start();
 		GLuint vbo = 0;
@@ -473,7 +459,7 @@ void render3d()
 		glRotatef(rot_angle / 3, rot_x, rot_z, rot_y);
 		glTranslatef(-2.0f, -2.0f, -2.0f);
 
-		/*glBegin(GL_QUADS);*/
+		glBegin(GL_QUADS);
 
 
 		float sz = 2.0f * 5.0f / size;
@@ -511,53 +497,53 @@ void render3d()
 			-sz + x_t, sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f
 		};
 
-		//for (int i = 0; i < size / 5; i++)
-		//{
-		//	y_t = 0.0f;
-		//	for (int j = 0; j < size / 5; j++)
-		//	{
-		//		x_t = 0.0f;
-		//		for (int k = 0; k < size / 5; k++)
-		//		{
-		//			if (life3d->getLifeform(k + 1, j + 1, i + 1) == 1)
-		//			{
-		//				if (shade == true)
-		//				{
-		//					GLfloat green[] = { 5.0f * ((float)i / (float)size), 5.0f * ((float)j / (float)size), 5.0f * ((float)k / (float)size) };
-		//					glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
-		//				}
+		for (int i = 0; i < size / 5; i++)
+		{
+			y_t = 0.0f;
+			for (int j = 0; j < size / 5; j++)
+			{
+				x_t = 0.0f;
+				for (int k = 0; k < size / 5; k++)
+				{
+					if (life3d->getLifeform(k + 1, j + 1, i + 1) == 1)
+					{
+						if (shade == true)
+						{
+							GLfloat green[] = { 5.0f * ((float)i / (float)size), 5.0f * ((float)j / (float)size), 5.0f * ((float)k / (float)size) };
+							glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+						}
 
-		//				glNormal3f(0.0F, 0.0F, 1.0F);
-		//				glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
-		//				glVertex3f(-sz + x_t, -sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
+						glNormal3f(0.0F, 0.0F, 1.0F);
+						glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
+						glVertex3f(-sz + x_t, -sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
 
-		//				glNormal3f(0.0F, 0.0F, -1.0F);
-		//				glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
-		//				glVertex3f(sz + x_t, sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
+						glNormal3f(0.0F, 0.0F, -1.0F);
+						glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
+						glVertex3f(sz + x_t, sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
 
-		//				glNormal3f(0.0F, 1.0F, 0.0F);
-		//				glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
-		//				glVertex3f(-sz + x_t, sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
+						glNormal3f(0.0F, 1.0F, 0.0F);
+						glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
+						glVertex3f(-sz + x_t, sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
 
-		//				glNormal3f(0.0F, -1.0F, 0.0F);
-		//				glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
-		//				glVertex3f(sz + x_t, -sz + y_t, sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
+						glNormal3f(0.0F, -1.0F, 0.0F);
+						glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
+						glVertex3f(sz + x_t, -sz + y_t, sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
 
-		//				glNormal3f(1.0F, 0.0F, 0.0F);
-		//				glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
-		//				glVertex3f(sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
+						glNormal3f(1.0F, 0.0F, 0.0F);
+						glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
+						glVertex3f(sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
 
-		//				glNormal3f(-1.0F, 0.0F, 0.0F);
-		//				glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
-		//				glVertex3f(-sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
-		//			}
-		//			x_t += sz * 2.0f;
-		//		}
-		//		y_t += sz * 2.0f;
-		//	}
-		//	z_t += sz * 2.0f;
-		//}
-		//glEnd();
+						glNormal3f(-1.0F, 0.0F, 0.0F);
+						glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
+						glVertex3f(-sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
+					}
+					x_t += sz * 2.0f;
+				}
+				y_t += sz * 2.0f;
+			}
+			z_t += sz * 2.0f;
+		}
+		glEnd();
 		if (sim == true)
 		{
 			//cout << clock() - time_e << endl;
