@@ -30,6 +30,9 @@ Scene g_current = scene1;
 //std::vector<GLfloat> vertices;
 //std::vector<glm::vec2> positions;
 
+//whether to show output of timers
+bool timer = false;
+
 void GLScene(int argc, char* argv[])
 {
 	GLScene(900, 900, argc, argv);
@@ -123,22 +126,38 @@ void DisplayGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (g_current == 0)
 	{
-		tm.start();
+		if(timer) tm.start();
 		render();
+		if (timer) tm.stop("Render 2D");
+
+		
+		if (sim == true)
+		{
+			if (timer) tm.start();
+			life->update();
+			if (timer) tm.stop("Simulation 2D");
+		}
+		
+
 		//testInstancedRendering();
-		tm.stop("Render 2D");
-		//float elapsed = tm.elaspsed();
-		//printf( "Render simulation: %5.1f ms\n", elapsed * 1000);
-		//screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
 	}
 	else
 		if (g_current == 1)
 		{
-			tm.start();
+			if(timer) tm.start();
 			render3d();
-			tm.stop("Render 3D");
-			//float elapsed = tm.elaspsed();
-			//printf("Render simulation: %5.1f ms\n", elapsed * 1000);
+			if(timer) tm.stop("Render 3D");
+
+			if (sim == true)
+			{
+				if ((int)(clock() - time_e) > 100)
+				{
+					time_e = clock();
+					if (timer) tm.start();	
+					life3d->update();
+					if (timer) tm.stop("Simulation 3D");
+				}
+			}
 
 		}
 	glutSwapBuffers();
@@ -291,6 +310,16 @@ void KeyboardGL(unsigned char c, int x, int y)
 		newLife();
 		newlife3d();
 	}
+
+	//our keys
+	if (c == 'b')
+	{
+		std::cout << "Do the benchmark!" << std::endl;
+	}
+	if (c == 't')
+	{
+		timer = !timer;
+	}
 }
 
 //std::vector<GLfloat> vertices;
@@ -324,8 +353,6 @@ GLfloat vertices[5000 * 5000 * 8];
 
 void render()
 {
-	Stopwatch copyTimer;
-
 	glewInit();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -334,13 +361,14 @@ void render()
 	float off = 500 / (float)size * 0.01f;
 	float pos_off = 500 / (float)size * 0.02f;
 
+	Stopwatch tm;
+
 	//glScalef(1.0f+scal, 1.0f+scal, 1.0f+scal);
 	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f + scal);
 	//glTranslatef(-0.5f, -0.5f, 0.0f);
 	if (shade == false) {
 		glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
-		Stopwatch tm;
-		tm.start();
+		if(timer) tm.start();
 
 		int vCount = 0;
 		int cCount = 0;
@@ -365,7 +393,7 @@ void render()
 			}
 			y_t += pos_off;
 		}
-		tm.stop("Loading vertices into array");
+		if(timer) tm.stop("Loading vertices into array");
 
 		//tm.start();
 		////count live with get life form
@@ -383,7 +411,7 @@ void render()
 		////live cells is used for the size of the array of vertices
 		//tm.stop("Counting live cells");
 
-		tm.start();
+		if(timer) tm.start(); //drawing vertices
 		GLuint vbo = 0;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -397,7 +425,7 @@ void render()
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDeleteBuffers(1, &vbo);
 
-		tm.stop("Drawing vertices");
+		if(timer) tm.stop("Drawing vertices");
 	}
 	else {
 		glBegin(GL_QUADS);
@@ -424,13 +452,6 @@ void render()
 	glPopMatrix();
 	//GLfloat cyan[] = { (169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f), 1.f };
 	//glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
-
-	
-
-	if (sim == true)
-	{
-		life->update();
-	}
 
 }
 
@@ -544,15 +565,6 @@ void render3d()
 			z_t += sz * 2.0f;
 		}
 		glEnd();
-		if (sim == true)
-		{
-			//cout << clock() - time_e << endl;
-			if ((int)(clock() - time_e) > 100)
-			{
-				time_e = clock();
-				life3d->update();
-			}
-		}
 
 		if (b_rot)
 		{
