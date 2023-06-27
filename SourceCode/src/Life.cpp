@@ -52,11 +52,11 @@ void Life::update()
 	//status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
 	if (!swapped) {
 		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), new_grid, 0, NULL, NULL);
+		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(bool) * (width + 2) * (height + 2), new_grid, 0, NULL, NULL);
 	}
 	else {
 		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(bool) * (width + 2) * (height + 2), new_grid, 0, NULL, NULL);
 	}
 	swapGrids();
 }
@@ -117,8 +117,8 @@ int Life::setupCL() {
 	/*Step 6: Build program. */
 	status = clBuildProgram(clinfo.program, 1, devices, NULL, NULL, NULL);
 
-	clinfo.gridBuffer = clCreateBuffer(clinfo.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (width + 2) * (height + 2) * sizeof(short), (void*)grid, NULL);
-	clinfo.new_gridBuffer = clCreateBuffer(clinfo.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (width + 2) * (height + 2) * sizeof(short), (void*)new_grid, NULL);
+	clinfo.gridBuffer = clCreateBuffer(clinfo.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (width + 2) * (height + 2) * sizeof(bool), (void*)grid, NULL);
+	clinfo.new_gridBuffer = clCreateBuffer(clinfo.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (width + 2) * (height + 2) * sizeof(bool), (void*)new_grid, NULL);
 
 	/*Step 8: Create kernel object */
 	clinfo.kernelUpdate = clCreateKernel(clinfo.program, "update", NULL);
@@ -253,7 +253,7 @@ void Life::randomize() {
 		int y = rand() % height + 1;
 		setLife(x, y, 1);
 	}
-	clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
+	clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(bool) * (width + 2) * (height + 2), grid, 0, NULL, NULL);
 }
 
 cl_mem Life::getGridBuffer()

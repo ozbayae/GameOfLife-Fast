@@ -410,6 +410,7 @@ void render()
 
 		////live cells is used for the size of the array of vertices
 		//tm.stop("Counting live cells");
+		//std::cout << "live cells:" << live_cells << std::endl;
 
 		if(timer) tm.start(); //drawing vertices
 		GLuint vbo = 0;
@@ -517,6 +518,8 @@ void render3d()
 			-sz + x_t, -sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f,
 			-sz + x_t, sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f
 		};
+
+
 
 		for (int i = 0; i < size / 5; i++)
 		{

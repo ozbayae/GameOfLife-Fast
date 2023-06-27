@@ -138,6 +138,7 @@
     <ClInclude Include="include\World3d.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Benchmark.h" />
     <ClCompile Include="include\learnopengl-shader.h" />
     <ClCompile Include="src\GPGPU.cpp" />
     <ClCompile Include="src\Stopwatch.cpp" />

@@ -5,7 +5,7 @@ __kernel void helloworld(__global char* in, __global char* out, __global float* 
 	numbers[num] = numbers[num] * x;
 }
 
-kernel void update(global short* grid, global short* new_grid, int width) {
+kernel void update(global bool* grid, global bool* new_grid, int width) {
     int x = get_global_id(0) + 1;
     int y = get_global_id(1) + 1;
 

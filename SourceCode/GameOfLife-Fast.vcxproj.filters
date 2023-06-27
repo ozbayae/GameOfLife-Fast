@@ -65,5 +65,8 @@
     <ClCompile Include="include\learnopengl-shader.h">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\Benchmark.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
