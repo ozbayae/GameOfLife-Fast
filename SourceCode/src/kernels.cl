@@ -6,41 +6,57 @@ __kernel void helloworld(__global char* in, __global char* out, __global float* 
 }
 
 
+bool getAlive(int x, int y, global bool* grid, int width)
+{
+    int index = x * width + y / 8;
+    int bit = y % 8;
+    unsigned char mask = 1 << bit;
+    return (grid[index] & mask) != 0;
+}
 
 kernel void update(global bool* grid, global bool* new_grid, int width) {
     int x = get_global_id(0) + 1;
     int y = get_global_id(1) + 1;
 
-    //int x = index / width;
-    //int y = index % height;
-    //int m = getNeighbours(x, y, grid, new_grid, width, height);
-
     int count = 0;
 
-    count += grid[(x - 1) * width + (y)];
-    count += grid[(x) * width + (y - 1)];
-    count += grid[(x - 1) * width + (y - 1)];
-    count += grid[(x + 1) * width + (y)];
+    ////count += grid[(x - 1) * width + (y)];
+    ////count += grid[(x) * width + (y - 1)];
+    ////count += grid[(x - 1) * width + (y - 1)];
+    ////count += grid[(x + 1) * width + (y)];
 
-    count += grid[(x) * width + (y + 1)];
-    count += grid[(x + 1) * width + (y + 1)];
-    count += grid[(x + 1) * width + (y - 1)];
-    count += grid[(x - 1) * width + (y + 1)];
+    ////count += grid[(x) * width + (y + 1)];
+    ////count += grid[(x + 1) * width + (y + 1)];
+    ////count += grid[(x + 1) * width + (y - 1)];
+    ////count += grid[(x - 1) * width + (y + 1)];
 
-    int index = x * width + y;
+    count += getAlive(x - 1, y, grid, width);
+    count += getAlive(x, y - 1, grid, width);
+    count += getAlive(x - 1, y - 1, grid, width);
+    count += getAlive(x + 1, y, grid, width);
 
-    if (count == 3)
+    count += getAlive(x, y + 1, grid, width);
+    count += getAlive(x + 1, y + 1, grid, width);
+    count += getAlive(x + 1, y - 1, grid, width);
+    count += getAlive(x - 1, y + 1, grid, width);
+
+    int index = x * width + y / 8;
+    ////set the position of the bool value within the byte array
+    int bitPosition = y % 8;
+
+    if (count == 3 || (count == 2 && ((grid[index] >> bitPosition) & 1)))
     {
-       new_grid[index] = 1;
-    }
-    else if (count == 2)
-    {
-       new_grid[index] = grid[index];
+        ////set the position of the bool value within the byte array
+        bool mask = 1 << bitPosition;
+        new_grid[index] |= mask;
     }
     else
     {
-       new_grid[index] = 0;
+        bool mask = ~(1 << bitPosition);
+        new_grid[index] &= mask;
     }
+
+    //new_grid[index] = grid[index];
 }
 
 kernel void update3d(global short* grid, global short* new_grid, int width, int height) {

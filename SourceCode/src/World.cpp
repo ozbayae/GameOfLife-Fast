@@ -1,13 +1,11 @@
 #include "World.h"
 
-#define BITS_IN_BOOL 8
-
 World::World(int w, int h)
 {
 	width = w;
 	height = h;
-	grid_width = width + 2;
-	grid_height = height + 2;
+	grid_width = (width + 2) / BITS_IN_BOOL;
+	grid_height = (height + 2);
 	grid = (bool *)malloc(grid_width * grid_height * sizeof(bool));
 	new_grid = (bool *)malloc(grid_width * grid_height * sizeof(bool));
 
@@ -24,7 +22,11 @@ World::~World(){
 
 void World::setNewLife(int x, int y, int val)
 { 
-	new_grid[x* grid_width + y] = val; 
+	//new_grid[x* grid_width + y] = val; 
+	if(val)
+		new_grid[x * grid_width + y / BITS_IN_BOOL] |= (1UL << (y % BITS_IN_BOOL));
+	else
+		new_grid[x * grid_width + y / BITS_IN_BOOL] &= ~(1UL << (y % BITS_IN_BOOL));
 }
 
 void World::swapGrids()
@@ -37,27 +39,47 @@ int World::getNeighbors(int x, int y, int val)
 {
 	int count = 0;
 
-	count += grid[(x - 1) * grid_width + (y)];
-	count += grid[(x) * grid_width + (y - 1)];
-	count += grid[(x - 1) * grid_width + (y - 1)];
-	count += grid[(x + 1) * grid_width + (y)];
+	//count += grid[(x - 1) * grid_width + (y)];
+	//count += grid[(x) * grid_width + (y - 1)];
+	//count += grid[(x - 1) * grid_width + (y - 1)];
+	//count += grid[(x + 1) * grid_width + (y)];
 
-	count += grid[(x) * grid_width + (y + 1)];
-	count += grid[(x + 1) * grid_width + (y + 1)];
-	count += grid[(x + 1) * grid_width + (y - 1)];
-	count += grid[(x - 1) * grid_width + (y + 1)];
-	
+	//count += grid[(x) * grid_width + (y + 1)];
+	//count += grid[(x + 1) * grid_width + (y + 1)];
+	//count += grid[(x + 1) * grid_width + (y - 1)];
+	//count += grid[(x - 1) * grid_width + (y + 1)];
+	//
+	//return count;
+	//return 0;
+	count += getLifeform(x - 1, y);
+	count += getLifeform(x, y - 1);
+	count += getLifeform(x - 1, y - 1);
+	count += getLifeform(x + 1, y);
+
+	count += getLifeform(x, y + 1);
+	count += getLifeform(x + 1, y + 1);
+	count += getLifeform(x + 1, y - 1);
+	count += getLifeform(x - 1, y + 1);
+
 	return count;
 }
 
 int World::getLifeform(int x, int y)
 { 
-		return grid[x*grid_width + y];
+		//return grid[x*grid_width + y];
+	int byte = grid[x * grid_width + y / BITS_IN_BOOL];
+	return (byte >> (y % BITS_IN_BOOL)) & 1U;
+	//return grid[x * grid_width + y / BITS_IN_BOOL] & (1 << (y % BITS_IN_BOOL));
 }
 
 void World::setLife(int x, int y, int val)
 { 
-	grid[x*grid_width + y] = val; 
+	//grid[x*grid_width + y] = val; 
+	//grid[x * grid_width + y] = val;
+	if (val)
+		grid[x * grid_width + y / BITS_IN_BOOL] |= 1UL << (y % BITS_IN_BOOL);
+	else
+		grid[x * grid_width + y / BITS_IN_BOOL] &= ~(1UL << (y % BITS_IN_BOOL));
 }
 
 void World::print()

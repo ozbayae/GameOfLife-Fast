@@ -8,6 +8,8 @@ using std::endl;
 #ifndef _WORLD_H
 #define _WORLD_H
 
+#define BITS_IN_BOOL 8 * sizeof(bool)
+
 class World
 {
 protected:

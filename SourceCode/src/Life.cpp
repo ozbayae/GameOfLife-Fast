@@ -25,40 +25,39 @@ Life::~Life()
 
 void Life::update()
 {
-	//for (unsigned int i = 1; i <= height; i++)
-	//{
-	//	for (unsigned int j = 1; j <= width; j++)
-	//	{
-	//		int m = getNeighbors(j, i, 1);
-	//		if (m == 3)
-	//		{
-	//			setNewLife(j, i, 1);
-	//		}
-	//		if (m == 2)
-	//		{
-	//			setNewLife(j, i, getLifeform(j, i));
-	//		}
-	//		if (m != 3 && m != 2)
-	//		{
-	//			setNewLife(j, i, 0);
-	//		}
-	//	}
-	//}
-	//swapGrids();
-
-
-	cl_int status;
-	//write data to device
-	//status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * grid_width * (height + 2), grid, 0, NULL, NULL);
-	if (!swapped) {
-		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(bool) * grid_width * grid_height, new_grid, 0, NULL, NULL);
-	}
-	else {
-		status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
-		status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(bool) * grid_width * grid_height, new_grid, 0, NULL, NULL);
+	for (unsigned int j = 1; j <= width; j++)
+	{
+		for (unsigned int i = 1; i <= height; i++) {
+			int m = getNeighbors(j, i, 1);
+			if (m == 3)
+			{
+				setNewLife(j, i, 1);
+			}
+			if (m == 2)
+			{
+				setNewLife(j, i, getLifeform(j, i));
+			}
+			if (m != 3 && m != 2)
+			{
+				setNewLife(j, i, 0);
+			}
+		}
 	}
 	swapGrids();
+
+
+	//cl_int status;
+	////write data to device
+	////status = clEnqueueWriteBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(short) * grid_width * (height + 2), grid, 0, NULL, NULL);
+	//if (!swapped) {
+	//	status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdate, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+	//	status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.new_gridBuffer, CL_TRUE, 0, sizeof(bool) * grid_width * grid_height, new_grid, 0, NULL, NULL);
+	//}
+	//else {
+	//	status = clEnqueueNDRangeKernel(clinfo.commandQueue, clinfo.kernelUpdateSwapped, 2, NULL, clinfo.globalWorkSize, NULL, 0, NULL, NULL);
+	//	status = clEnqueueReadBuffer(clinfo.commandQueue, clinfo.gridBuffer, CL_TRUE, 0, sizeof(bool) * grid_width * grid_height, new_grid, 0, NULL, NULL);
+	//}
+	//swapGrids();
 }
 
 int Life::setupCL() {
@@ -124,7 +123,7 @@ int Life::setupCL() {
 	clinfo.kernelUpdate = clCreateKernel(clinfo.program, "update", NULL);
 	clinfo.kernelUpdateSwapped = clCreateKernel(clinfo.program, "update", NULL);
 
-	cl_int width = this->width;
+	//cl_int width = this->width;
 	/*Step 9: Sets Kernel arguments.*/
 	status = clSetKernelArg(clinfo.kernelUpdate, 0, sizeof(cl_mem), &(clinfo.gridBuffer));
 	status = clSetKernelArg(clinfo.kernelUpdate, 1, sizeof(cl_mem), &(clinfo.new_gridBuffer));
