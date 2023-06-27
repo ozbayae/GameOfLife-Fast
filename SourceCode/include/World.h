@@ -15,6 +15,8 @@ protected:
 	bool* new_grid;
 	unsigned int width;
 	unsigned int height;
+	unsigned int grid_width;
+	unsigned int grid_height;
 
 	bool swapped = false;
 

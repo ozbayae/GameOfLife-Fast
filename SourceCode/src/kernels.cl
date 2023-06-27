@@ -5,6 +5,8 @@ __kernel void helloworld(__global char* in, __global char* out, __global float* 
 	numbers[num] = numbers[num] * x;
 }
 
+
+
 kernel void update(global bool* grid, global bool* new_grid, int width) {
     int x = get_global_id(0) + 1;
     int y = get_global_id(1) + 1;
@@ -15,17 +17,17 @@ kernel void update(global bool* grid, global bool* new_grid, int width) {
 
     int count = 0;
 
-    count += grid[(x - 1) * (width + 2) + (y)];
-    count += grid[(x) * (width + 2) + (y - 1)];
-    count += grid[(x - 1) * (width + 2) + (y - 1)];
-    count += grid[(x + 1) * (width + 2) + (y)];
+    count += grid[(x - 1) * width + (y)];
+    count += grid[(x) * width + (y - 1)];
+    count += grid[(x - 1) * width + (y - 1)];
+    count += grid[(x + 1) * width + (y)];
 
-    count += grid[(x) * (width + 2) + (y + 1)];
-    count += grid[(x + 1) * (width + 2) + (y + 1)];
-    count += grid[(x + 1) * (width + 2) + (y - 1)];
-    count += grid[(x - 1) * (width + 2) + (y + 1)];
+    count += grid[(x) * width + (y + 1)];
+    count += grid[(x + 1) * width + (y + 1)];
+    count += grid[(x + 1) * width + (y - 1)];
+    count += grid[(x - 1) * width + (y + 1)];
 
-    int index = x * (width + 2) + y;
+    int index = x * width + y;
 
     if (count == 3)
     {
