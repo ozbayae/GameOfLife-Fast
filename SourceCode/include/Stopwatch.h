@@ -20,4 +20,5 @@ class Stopwatch {
 public:
 	void start();
 	void stop(std::string message);
+	float stop();
 };

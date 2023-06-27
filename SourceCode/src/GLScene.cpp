@@ -1,5 +1,6 @@
 #include "GLScene.h"
 #include "Stopwatch.h"
+#include "Benchmark.h"
 #include <vector>
 #include "learnopengl-shader.h"
 #include <algorithm>
@@ -29,11 +30,43 @@ int time_e = clock();
 
 Scene g_current = scene1;
 
-//std::vector<GLfloat> vertices;
-//std::vector<glm::vec2> positions;
-
-//whether to show output of timers
+//whether to show output of various timers
 bool timer = false;
+
+//benchmarking variables
+bool benchmark = false;
+
+std::vector<int> sizes2d = { 1000, 2000, 3000, 4000, 5000 };
+const int iterations = 60; //per size how many frames will be collected for the average and std dev
+const int warmup_cycles = 100; //how many frames to run before collecting data to warm up the cache
+
+Benchmark render_bench2d(
+	"2D Rendering Benchmark",
+	sizes2d, //sizes
+	iterations, //iterations
+	warmup_cycles //warmup cycles
+);
+Benchmark simulation_bench2d(
+	"2D Simulation Benchmark",
+	sizes2d, //sizes, has to be the same as render_bench2d
+	iterations, //iterations
+	warmup_cycles //warmup cycles
+);
+
+std::vector<int> sizes3d = { 400, 500, 600, 700, 800 };
+Benchmark render_bench3d(
+	"3D Rendering Benchmark",
+	sizes3d, //sizes
+	iterations, //iterations
+	warmup_cycles //warmup cycles
+);
+
+Benchmark simulation_bench3d(
+	"3D Simulation Benchmark",
+	sizes3d, //sizes, has to be the same as render_bench2d
+	iterations, //iterations
+	warmup_cycles //warmup cycles
+);
 
 void GLScene(int argc, char* argv[])
 {
@@ -122,29 +155,78 @@ void newlife3d()
 
 }
 
+
+
+
+
 void DisplayGL()
 {
-	Stopwatch tm;
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if (g_current == 0)
-	{
-		if (timer) tm.start();
-		render();
-		if (timer) tm.stop("Render 2D");
-
-
-		if (sim == true)
-		{
-			if (timer) tm.start();
-			life->update();
-			if (timer) tm.stop("Simulation 2D");
+	if (benchmark) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		static bool doing2d = true;
+		if (doing2d) {
+			int current_size = render_bench2d.GetCurrentSize();
+			if (size != current_size) {
+				size = current_size;
+				newLife();
+			}
+			if (render_bench2d.Advance()) {
+				render_bench2d.StartTiming();
+				render();
+				render_bench2d.StopTiming();
+			}
+			if (simulation_bench2d.Advance()) {
+				simulation_bench2d.StartTiming();
+				life->update();
+				simulation_bench2d.StopTiming();
+			}
+			if (render_bench2d.IsDone() && simulation_bench2d.IsDone()) {
+				doing2d = false;
+			}
+		} else {
+			//do the same for 3d
+			int current_size = render_bench3d.GetCurrentSize();
+			if (size != current_size) {
+				size = current_size;
+				newlife3d();
+			}
+			if (render_bench3d.Advance()) {
+				render_bench3d.StartTiming();
+				render3d();
+				render_bench3d.StopTiming();
+			}
+			if (simulation_bench3d.Advance()) {
+				simulation_bench3d.StartTiming();
+				life3d->update();
+				simulation_bench3d.StopTiming();
+			}
+			if (render_bench3d.IsDone() && simulation_bench3d.IsDone()) {
+				benchmark = false;
+				exit(0);
+			}
 		}
 
+	} else {
+		Stopwatch tm;
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (g_current == 0)
+		{
+			if (timer) tm.start();
+			render();
+			if (timer) tm.stop("Render 2D");
 
-		//testInstancedRendering();
-	}
-	else
-		if (g_current == 1)
+
+			if (sim == true)
+			{
+				if (timer) tm.start();
+				life->update();
+				if (timer) tm.stop("Simulation 2D");
+			}
+
+
+			//testInstancedRendering();
+		}
+		else if (g_current == 1)
 		{
 			if (timer) tm.start();
 			render3d();
@@ -162,6 +244,8 @@ void DisplayGL()
 			}
 
 		}
+	}
+	
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -317,6 +401,7 @@ void KeyboardGL(unsigned char c, int x, int y)
 	if (c == 'b')
 	{
 		std::cout << "Do the benchmark!" << std::endl;
+		benchmark = true;
 	}
 	if (c == 't')
 	{
