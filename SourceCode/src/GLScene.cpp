@@ -130,20 +130,8 @@ void newLife()
 {
 	// ew--calling a destructor
 	life->~Life();
-	//vertices.clear();
-
 	life = new Life(size, size);
-
-	////fill positions vector
-	//for (int i = 0; i < size; i++)
-	//{
-	//	for (int j = 0; j < size; j++)
-	//	{
-	//		positions.push_back(glm::vec2(i, j));
-	//	}
-	//}
 	life->randomize();
-
 }
 
 void newlife3d()
@@ -154,10 +142,6 @@ void newlife3d()
 	life3d->randomize();
 
 }
-
-
-
-
 
 void DisplayGL()
 {
@@ -182,28 +166,52 @@ void DisplayGL()
 			}
 			if (render_bench2d.IsDone() && simulation_bench2d.IsDone()) {
 				doing2d = false;
+	
+				glEnable(GL_DEPTH_TEST);
+				glEnable(GL_LIGHTING);
+				glEnable(GL_LIGHT0);
+				g_current = scene2;
 			}
-		} else {
-			//do the same for 3d
-			int current_size = render_bench3d.GetCurrentSize();
-			if (size != current_size) {
-				size = current_size;
-				newlife3d();
+		}
+		else {
+			//because the simulation is run at a different rate than the rendering,
+			// we benchmark the simulation and rendering separately
+			static bool doing3dRender = true;
+			if (doing3dRender) {
+				int current_size = render_bench3d.GetCurrentSize();
+				if (size != current_size) {
+					size = current_size;
+					newlife3d();
+				}
+				if (render_bench3d.Advance()) {
+					render_bench3d.StartTiming();
+					render3d();
+					render_bench3d.StopTiming();
+					if ((int)(clock() - time_e) > 100)
+					{
+						time_e = clock();
+						life3d->update();
+					}
+				}
+				if(render_bench3d.IsDone()) 
+					doing3dRender = false;
+			} else {
+				int current_size = simulation_bench3d.GetCurrentSize();
+				if (size != current_size) {
+					size = current_size;
+					newlife3d();
+				}
+				if (simulation_bench3d.Advance()) {
+					simulation_bench3d.StartTiming();
+					life3d->update();
+					simulation_bench3d.StopTiming();
+				}
+				if (render_bench3d.IsDone() && simulation_bench3d.IsDone()) {
+					benchmark = false;
+					exit(0);
+				}
 			}
-			if (render_bench3d.Advance()) {
-				render_bench3d.StartTiming();
-				render3d();
-				render_bench3d.StopTiming();
-			}
-			if (simulation_bench3d.Advance()) {
-				simulation_bench3d.StartTiming();
-				life3d->update();
-				simulation_bench3d.StopTiming();
-			}
-			if (render_bench3d.IsDone() && simulation_bench3d.IsDone()) {
-				benchmark = false;
-				exit(0);
-			}
+
 		}
 
 	} else {
@@ -401,6 +409,14 @@ void KeyboardGL(unsigned char c, int x, int y)
 	if (c == 'b')
 	{
 		std::cout << "Do the benchmark!" << std::endl;
+		if (g_current == scene2)
+		{
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
+			glDisable(GL_LIGHT0);
+			g_current = scene1;
+		}
+
 		benchmark = true;
 	}
 	if (c == 't')
