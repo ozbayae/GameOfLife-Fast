@@ -3,6 +3,8 @@
 #include <vector>
 #include "learnopengl-shader.h"
 #include <algorithm>
+#include <thread>
+
 int size = 500;
 
 Life3d* life3d = new Life3d(size / 5, size / 5, size / 5);
@@ -126,34 +128,34 @@ void DisplayGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (g_current == 0)
 	{
-		if(timer) tm.start();
+		if (timer) tm.start();
 		render();
 		if (timer) tm.stop("Render 2D");
 
-		
+
 		if (sim == true)
 		{
 			if (timer) tm.start();
 			life->update();
 			if (timer) tm.stop("Simulation 2D");
 		}
-		
+
 
 		//testInstancedRendering();
 	}
 	else
 		if (g_current == 1)
 		{
-			if(timer) tm.start();
+			if (timer) tm.start();
 			render3d();
-			if(timer) tm.stop("Render 3D");
+			if (timer) tm.stop("Render 3D");
 
 			if (sim == true)
 			{
 				if ((int)(clock() - time_e) > 100)
 				{
 					time_e = clock();
-					if (timer) tm.start();	
+					if (timer) tm.start();
 					life3d->update();
 					if (timer) tm.stop("Simulation 3D");
 				}
@@ -347,9 +349,68 @@ void ReshapeGL(int w, int h)
 }
 
 
+const int NUM_THREADS = 8;
 
 //faster than vector since it is a fixed size, no dynamic allocation needed as vector grows	
-GLfloat vertices[5000 * 5000 * 8];
+GLfloat vertices[NUM_THREADS][5000 * 5000 / NUM_THREADS * 8];
+int vCounts[NUM_THREADS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+void processIterations(int start, int end, int size, float off, float pos_off, Life* life, float* vertices, int& vCount) {
+	for (int i = start; i < end; i++)
+	{
+		float x_t = 0.0f;
+		float y_t = i * pos_off;
+		for (int j = 0; j < size; j++)
+		{
+			if (life->getLifeform(j + 1, i + 1) == 1)
+			{
+				vertices[vCount++] = x_t - off;
+				vertices[vCount++] = y_t + off;
+				vertices[vCount++] = x_t + off;
+				vertices[vCount++] = y_t + off;
+				vertices[vCount++] = x_t + off;
+				vertices[vCount++] = y_t - off;
+				vertices[vCount++] = x_t - off;
+				vertices[vCount++] = y_t - off;
+			}
+			x_t += pos_off;
+		}
+	}
+}
+
+// Define a function that splits the iterations into multiple threads and waits for them to finish
+void processIterationsMultithreaded(int size, float off, float pos_off, Life* life) {
+	//zero initialize vCounts array
+	for (int i = 0; i < NUM_THREADS; i++) {
+		vCounts[i] = 0;
+	}
+
+	const int numThreads = NUM_THREADS; // Change this to the number of threads you want to use
+	std::thread threads[numThreads];
+
+	// Split the iterations into equal chunks for each thread
+	int chunkSize = size / numThreads;
+	int start = 0;
+	int end = chunkSize;
+	for (int i = 0; i < numThreads; i++) {
+		// The last thread may have to handle more iterations if size is not divisible by numThreads
+		if (i == numThreads - 1) {
+			end = size;
+		}
+
+		// Create a thread for the current chunk of iterations
+		threads[i] = std::thread(processIterations, start, end, size, off, pos_off, life, vertices[i], std::ref(vCounts[i]));
+
+		// Move the start and end indices to the next chunk
+		start = end;
+		end += chunkSize;
+	}
+
+	// Wait for all threads to finish
+	for (int i = 0; i < numThreads; i++) {
+		threads[i].join();
+	}
+}
 
 void render()
 {
@@ -368,32 +429,35 @@ void render()
 	//glTranslatef(-0.5f, -0.5f, 0.0f);
 	if (shade == false) {
 		glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
-		if(timer) tm.start();
+		if (timer) tm.start();
 
-		int vCount = 0;
-		int cCount = 0;
-		for (int i = 0; i < size; i++)
-		{
-			x_t = 0.0f;
-			for (int j = 0; j < size; j++)
-			{
-				if (life->getLifeform(j + 1, i + 1) == 1)
-				{
-					vertices[vCount++] = x_t - off;
-					vertices[vCount++] = y_t + off;
-					vertices[vCount++] = x_t + off;
-					vertices[vCount++] = y_t + off;
-					vertices[vCount++] = x_t + off;
-					vertices[vCount++] = y_t - off;
-					vertices[vCount++] = x_t - off;
-					vertices[vCount++] = y_t - off;
-				}
+		//int vCount = 0;
+		//for (int i = 0; i < size; i++)
+		//{
+		//	x_t = 0.0f;
+		//	for (int j = 0; j < size; j++)
+		//	{
+		//		if (life->getLifeform(j + 1, i + 1) == 1)
+		//		{
+		//			int my_vCount = vCount;
+		//			vCount += 8;
+		//			vertices[my_vCount++] = x_t - off;
+		//			vertices[my_vCount++] = y_t + off;
+		//			vertices[my_vCount++] = x_t + off;
+		//			vertices[my_vCount++] = y_t + off;
+		//			vertices[my_vCount++] = x_t + off;
+		//			vertices[my_vCount++] = y_t - off;
+		//			vertices[my_vCount++] = x_t - off;
+		//			vertices[my_vCount++] = y_t - off;
+		//		}
 
-				x_t += pos_off;
-			}
-			y_t += pos_off;
-		}
-		if(timer) tm.stop("Loading vertices into array");
+		//		x_t += pos_off;
+		//	}
+		//	y_t += pos_off;
+		//}
+
+		processIterationsMultithreaded(size, off, pos_off, life);
+		if (timer) tm.stop("Loading vertices into array");
 
 		//tm.start();
 		////count live with get life form
@@ -411,22 +475,32 @@ void render()
 		////live cells is used for the size of the array of vertices
 		//tm.stop("Counting live cells");
 		//std::cout << "live cells:" << live_cells << std::endl;
+		int total_size = 0;
+		for (int i = 0; i < NUM_THREADS; i++) {
+			total_size += vCounts[i];
+		}
 
-		if(timer) tm.start(); //drawing vertices
 		GLuint vbo = 0;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vCount * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, total_size * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
+
+		if (timer) tm.start(); //drawing vertices
+		int data_offset = 0;
+		for (int i = 0; i < NUM_THREADS; i++) {
+			glBufferSubData(GL_ARRAY_BUFFER, data_offset * sizeof(GLfloat), vCounts[i] * sizeof(GLfloat), &vertices[i][0]);
+			data_offset += vCounts[i];
+		}
+
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(2, GL_FLOAT, 0, 0);
-
-		glDrawArrays(GL_QUADS, 0, vCount / 2);
+		glDrawArrays(GL_QUADS, 0, total_size / 2);
 
 		glDisableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDeleteBuffers(1, &vbo);
 
-		if(timer) tm.stop("Drawing vertices");
+		if (timer) tm.stop("Drawing vertices");
 	}
 	else {
 		glBegin(GL_QUADS);
