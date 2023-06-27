@@ -463,7 +463,7 @@ void processIterations(int start, int end, int size, float off, float pos_off, L
 		float y_t = i * pos_off;
 		for (int j = 0; j < size; j++)
 		{
-			if (life->getLifeform(j + 1, i + 1) == 1)
+			if (life->getLifeform(i + 1, j + 1) == 1)
 			{
 				vertices[vCount++] = x_t - off;
 				vertices[vCount++] = y_t + off;
