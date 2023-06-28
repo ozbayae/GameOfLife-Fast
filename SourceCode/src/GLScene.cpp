@@ -529,79 +529,97 @@ void render()
 	glTranslatef(-5.0f + x_offset, -5.0f + y_offset, -9.0f + scal);
 	//glTranslatef(-0.5f, -0.5f, 0.0f);
 	if (shade == false) {
-		glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
+		//glColor3f((169.0f / 255.0f), (234.0f / 255.0f), (123.0f / 255.0f));
 		if (timer) tm.start();
+		
+		bool* grid = life->getGrid();
+		//set the grid as texture
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, grid);
 
-		//int vCount = 0;
-		//for (int i = 0; i < size; i++)
-		//{
-		//	x_t = 0.0f;
-		//	for (int j = 0; j < size; j++)
-		//	{
-		//		if (life->getLifeform(j + 1, i + 1) == 1)
-		//		{
-		//			int my_vCount = vCount;
-		//			vCount += 8;
-		//			vertices[my_vCount++] = x_t - off;
-		//			vertices[my_vCount++] = y_t + off;
-		//			vertices[my_vCount++] = x_t + off;
-		//			vertices[my_vCount++] = y_t + off;
-		//			vertices[my_vCount++] = x_t + off;
-		//			vertices[my_vCount++] = y_t - off;
-		//			vertices[my_vCount++] = x_t - off;
-		//			vertices[my_vCount++] = y_t - off;
-		//		}
+		//bind texture 
+		glBindTexture(GL_TEXTURE_2D, texture);
 
-		//		x_t += pos_off;
-		//	}
-		//	y_t += pos_off;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size, size, 0, GL_RED, GL_UNSIGNED_BYTE, grid);
+		//draw the texture on a square
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-10.0f, -10.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(10.0f, -10.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(10.0f, 10.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(-10.0f, 10.0f);
+		glEnd();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		////int vCount = 0;
+		////for (int i = 0; i < size; i++)
+		////{
+		////	x_t = 0.0f;
+		////	for (int j = 0; j < size; j++)
+		////	{
+		////		if (life->getLifeform(j + 1, i + 1) == 1)
+		////		{
+		////			int my_vCount = vCount;
+		////			vCount += 8;
+		////			vertices[my_vCount++] = x_t - off;
+		////			vertices[my_vCount++] = y_t + off;
+		////			vertices[my_vCount++] = x_t + off;
+		////			vertices[my_vCount++] = y_t + off;
+		////			vertices[my_vCount++] = x_t + off;
+		////			vertices[my_vCount++] = y_t - off;
+		////			vertices[my_vCount++] = x_t - off;
+		////			vertices[my_vCount++] = y_t - off;
+		////		}
+
+		////		x_t += pos_off;
+		////	}
+		////	y_t += pos_off;
+		////}
+
+		//processIterationsMultithreaded(size, off, pos_off, life);
+		//if (timer) tm.stop("Loading vertices into array");
+
+		////tm.start();
+		//////count live with get life form
+		////int live_cells = 0;
+		////for (int i = 0; i < size; i++) {
+		////	for (int j = 0; j < size; j++)
+		////	{
+		////		if (life->getLifeform(j + 1, i + 1) == 1)
+		////		{
+		////			live_cells++;
+		////		}
+		////	}
+		////}
+
+		//////live cells is used for the size of the array of vertices
+		////tm.stop("Counting live cells");
+		////std::cout << "live cells:" << live_cells << std::endl;
+		//int total_size = 0;
+		//for (int i = 0; i < NUM_THREADS; i++) {
+		//	total_size += vCounts[i];
 		//}
 
-		processIterationsMultithreaded(size, off, pos_off, life);
-		if (timer) tm.stop("Loading vertices into array");
+		//GLuint vbo = 0;
+		//glGenBuffers(1, &vbo);
+		//glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		//glBufferData(GL_ARRAY_BUFFER, total_size * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 
-		//tm.start();
-		////count live with get life form
-		//int live_cells = 0;
-		//for (int i = 0; i < size; i++) {
-		//	for (int j = 0; j < size; j++)
-		//	{
-		//		if (life->getLifeform(j + 1, i + 1) == 1)
-		//		{
-		//			live_cells++;
-		//		}
-		//	}
+		//if (timer) tm.start(); //drawing vertices
+		//int data_offset = 0;
+		//for (int i = 0; i < NUM_THREADS; i++) {
+		//	glBufferSubData(GL_ARRAY_BUFFER, data_offset * sizeof(GLfloat), vCounts[i] * sizeof(GLfloat), &vertices[i][0]);
+		//	data_offset += vCounts[i];
 		//}
 
-		////live cells is used for the size of the array of vertices
-		//tm.stop("Counting live cells");
-		//std::cout << "live cells:" << live_cells << std::endl;
-		int total_size = 0;
-		for (int i = 0; i < NUM_THREADS; i++) {
-			total_size += vCounts[i];
-		}
+		//glEnableClientState(GL_VERTEX_ARRAY);
+		//glVertexPointer(2, GL_FLOAT, 0, 0);
+		//glDrawArrays(GL_QUADS, 0, total_size / 2);
 
-		GLuint vbo = 0;
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, total_size * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
+		//glDisableVertexAttribArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//glDeleteBuffers(1, &vbo);
 
-		if (timer) tm.start(); //drawing vertices
-		int data_offset = 0;
-		for (int i = 0; i < NUM_THREADS; i++) {
-			glBufferSubData(GL_ARRAY_BUFFER, data_offset * sizeof(GLfloat), vCounts[i] * sizeof(GLfloat), &vertices[i][0]);
-			data_offset += vCounts[i];
-		}
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_FLOAT, 0, 0);
-		glDrawArrays(GL_QUADS, 0, total_size / 2);
-
-		glDisableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDeleteBuffers(1, &vbo);
-
-		if (timer) tm.stop("Drawing vertices");
+		//if (timer) tm.stop("Drawing vertices");
 	}
 	else {
 		glBegin(GL_QUADS);

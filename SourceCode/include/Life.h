@@ -45,4 +45,6 @@ public:
 	//get gridbuffer
 	cl_mem getGridBuffer();
 
+	bool* getGrid();
+
 };

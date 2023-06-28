@@ -184,3 +184,8 @@ cl_mem Life::getGridBuffer()
 {
 	return clinfo.gridBuffer;
 }
+
+bool* Life::getGrid()
+{
+	return grid;
+}
