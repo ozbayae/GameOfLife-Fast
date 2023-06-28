@@ -129,19 +129,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Benchmark.h" />
     <ClInclude Include="include\GLScene.h" />
     <ClInclude Include="include\Life.h" />
     <ClInclude Include="include\Life3d.h" />
+    <ClInclude Include="include\Stopwatch.h" />
     <ClInclude Include="include\World.h" />
     <ClInclude Include="include\World3d.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Benchmark.cpp" />
     <ClCompile Include="src\GLScene.cpp" />
     <ClCompile Include="src\Life.cpp" />
     <ClCompile Include="src\Life3d.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Stopwatch.cpp" />
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\World3d.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\kernels.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
