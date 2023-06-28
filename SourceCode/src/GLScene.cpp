@@ -5,6 +5,7 @@
 #include "learnopengl-shader.h"
 #include <algorithm>
 #include <thread>
+#include "glm/gtc/matrix_transform.hpp"
 
 int size = 500;
 
@@ -109,6 +110,8 @@ void GLScene(int x, int y, int argc, char* argv[])
 	glClearColor(0.156f, 0.172f, 0.203f, 1.00f);
 	glClearDepth(1.0f);
 	glShadeModel(GL_SMOOTH);
+
+	glewInit();
 
 }
 
@@ -515,7 +518,7 @@ void processIterationsMultithreaded(int size, float off, float pos_off, Life* li
 
 void render()
 {
-	glewInit();
+	//glewInit();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float y_t = 0.0f;
@@ -639,6 +642,7 @@ void render3d()
 		float x_t = 0.0f;
 		float z_t = 0.0f;
 
+		//glewInit();
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
@@ -656,13 +660,11 @@ void render3d()
 		glRotatef(rot_angle / 3, rot_x, rot_z, rot_y);
 		glTranslatef(-2.0f, -2.0f, -2.0f);
 
-		glBegin(GL_QUADS);
-
 
 		float sz = 2.0f * 5.0f / size;
 
 		//define the 3d cube with vertices and normals
-		float quadCube[] = {
+		float cubeVertices[] = {
 			sz + x_t, sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
 			sz + x_t, -sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
 			-sz + x_t, -sz + y_t, sz + z_t, 0.0f, 0.0f, 1.0f,
@@ -694,7 +696,108 @@ void render3d()
 			-sz + x_t, sz + y_t, -sz + z_t, -1.0f, 0.0f, 0.0f
 		};
 
+	//	std::vector<glm::vec3> translations;
+	//	int cubeCount = 0;
+	//	for (int i = 0; i < size / 5; i++)
+	//	{
+	//		y_t = 0.0f;
+	//		for (int j = 0; j < size / 5; j++)
+	//		{
+	//			x_t = 0.0f;
+	//			for (int k = 0; k < size / 5; k++)
+	//			{
+	//				if (life3d->getLifeform(j + 1, k + 1, i + 1) == 1)
+	//				{
+	//					translations.push_back(glm::vec3(x_t, y_t, z_t));
+	//					/*if (shade == true)
+	//					{
+	//						GLfloat green[] = { 5.0f * ((float)i / (float)size), 5.0f * ((float)j / (float)size), 5.0f * ((float)k / (float)size) };
+	//						glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+	//					}
 
+	//					glNormal3f(0.0F, 0.0F, 1.0F);
+	//					glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
+	//					glVertex3f(-sz + x_t, -sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
+
+	//					glNormal3f(0.0F, 0.0F, -1.0F);
+	//					glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);
+	//					glVertex3f(sz + x_t, sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
+
+	//					glNormal3f(0.0F, 1.0F, 0.0F);
+	//					glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
+	//					glVertex3f(-sz + x_t, sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, sz + y_t, sz + z_t);
+
+	//					glNormal3f(0.0F, -1.0F, 0.0F);
+	//					glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, -sz + y_t, -sz + z_t);
+	//					glVertex3f(sz + x_t, -sz + y_t, sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
+
+	//					glNormal3f(1.0F, 0.0F, 0.0F);
+	//					glVertex3f(sz + x_t, sz + y_t, sz + z_t); glVertex3f(sz + x_t, -sz + y_t, sz + z_t);
+	//					glVertex3f(sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(sz + x_t, sz + y_t, -sz + z_t);
+
+	//					glNormal3f(-1.0F, 0.0F, 0.0F);
+	//					glVertex3f(-sz + x_t, -sz + y_t, -sz + z_t); glVertex3f(-sz + x_t, -sz + y_t, sz + z_t);
+	//					glVertex3f(-sz + x_t, sz + y_t, sz + z_t); glVertex3f(-sz + x_t, sz + y_t, -sz + z_t);*/
+	//				}
+	//				x_t += sz * 2.0f;
+	//			}
+	//			y_t += sz * 2.0f;
+	//		}
+	//		z_t += sz * 2.0f;
+	//	}
+	//	cubeCount = translations.size();
+
+	//	 store instance data in an array buffer
+ //--------------------------------------
+	//	unsigned int instanceVBO;
+	//	glGenBuffers(1, &instanceVBO);
+	//	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * cubeCount, &translations[0], GL_STATIC_DRAW);
+	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//	unsigned int cubeVAO, cubeVBO;
+	//	glGenVertexArrays(1, &cubeVAO);
+	//	glGenBuffers(1, &cubeVBO);
+	//	glBindVertexArray(cubeVAO);
+	//	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	//	vertex positions
+	//	glEnableVertexAttribArray(0);
+	//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	//	normals
+	//	glEnableVertexAttribArray(1);
+	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	//	 also set instance data
+	//	glEnableVertexAttribArray(2);
+	//	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
+	//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//	glVertexAttribDivisor(2, 1); // tell OpenGL this is an instanced vertex attribute.
+
+	//	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//	Shader shader("shaders/instance3d.vs", "shaders/instance3d.fs");
+	//	set the view based on rot angle: rot_x, rot_y, rot_z
+	//	glm::mat4 view = glm::mat4(1.0f);
+	//	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//	view = glm::rotate(view, glm::radians(rot_x), glm::vec3(1.0f, 0.0f, 0.0f));
+	//	view = glm::rotate(view, glm::radians(rot_y), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	view = glm::rotate(view, glm::radians(rot_z), glm::vec3(0.0f, 0.0f, 1.0f));
+	//	shader.setMat4("view", view);
+
+	//	 draw 100 instanced quads
+	//	shader.use();
+	//	glBindVertexArray(cubeVAO);
+	//	glDrawArraysInstanced(GL_QUADS, 0, 24, cubeCount / 3); // 24 vertices of a 3x3 quad
+	//	glBindVertexArray(0);
+
+
+
+	glBegin(GL_QUADS);
 
 		for (int i = 0; i < size / 5; i++)
 		{
